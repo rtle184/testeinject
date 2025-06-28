@@ -137,15 +137,14 @@ if (!(Test-Path $shellPath)) {
     New-Item -Path $shellPath -Force | Out-Null
 }
 
-$command = 'powershell.exe -WindowStyle Hidden -Command "$file = ''%1'' -replace ''msiexec://'', ''''; if (Test-Path $file) { Start-Process ''msiexec.exe'' -ArgumentList ''/i'', $file -Verb RunAs } else { Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show(''File not found: '' + $file, ''Error'', ''OK'', ''Error'') }"'
+$command = "powershell.exe -WindowStyle Hidden -Command \\"\\$file = '%1' -replace 'msiexec://', ''; if (Test-Path \\$file) { Start-Process 'msiexec.exe' -ArgumentList '/i', \\$file -Verb RunAs } else { Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('File not found: ' + \\$file, 'Error', 'OK', 'Error') }\\""
 Set-ItemProperty -Path $shellPath -Name "(Default)" -Value $command
 
 Write-Host "Protocol handler registered successfully!" -ForegroundColor Green
 Write-Host "You can now use msiexec://path/to/file.msi URLs to auto-install MSI files." -ForegroundColor Green
 Write-Host ""
 Write-Host "Press any key to exit..."
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-'''
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")'''
     
     ps_file_path = STATIC_DIR / "installer-helper.ps1"
     with open(ps_file_path, "w", encoding="utf-8") as f:
