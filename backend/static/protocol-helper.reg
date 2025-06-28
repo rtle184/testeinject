@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\msiexec]
+@="MSI Executor Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\msiexec\DefaultIcon]
+@="C:\\Windows\\System32\\msiexec.exe,0"
+
+[HKEY_CLASSES_ROOT\msiexec\shell]
+
+[HKEY_CLASSES_ROOT\msiexec\shell\open]
+
+[HKEY_CLASSES_ROOT\msiexec\shell\open\command]
+@="powershell.exe -WindowStyle Hidden -Command \"$file = '%1' -replace 'msiexec://', ''; if (Test-Path $file) { Start-Process 'msiexec.exe' -ArgumentList '/i', $file -Verb RunAs } else { [System.Windows.Forms.MessageBox]::Show('File not found: ' + $file, 'Error', 'OK', 'Error') }\""
