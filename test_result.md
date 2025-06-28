@@ -107,39 +107,48 @@ user_problem_statement: "Criar um botão que baixa arquivo .msi e executa automa
 backend:
   - task: "MSI Download API"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado API para download de MSI com custom protocol handler"
+      - working: true
+        agent: "testing"
+        comment: "MSI Download API endpoint (/api/download/sample.msi) is working correctly. The endpoint returns the MSI file with the proper Content-Type (application/octet-stream) and Content-Disposition headers. The file content is also being served correctly."
 
   - task: "Protocol Helper Downloads"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado endpoints para baixar registry file e PowerShell script"
+      - working: true
+        agent: "testing"
+        comment: "Protocol Helper Downloads endpoints (/api/download/protocol-helper.reg and /api/download/installer-helper.ps1) are working correctly. Both endpoints return the files with proper Content-Type and Content-Disposition headers. The registry file contains the expected Windows Registry entries, and the PowerShell script contains the expected helper script content."
 
   - task: "Download Statistics"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado tracking de downloads com MongoDB"
+      - working: true
+        agent: "testing"
+        comment: "Download Statistics endpoints (/api/track-download and /api/downloads) are working correctly. The POST endpoint successfully tracks download records with user agent and IP information, and the GET endpoint successfully retrieves the list of downloads from MongoDB. The MongoDB integration is working as expected."
 
 frontend:
   - task: "MSI Download Button"
