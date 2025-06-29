@@ -219,15 +219,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "MSI Download API"
-    - "Protocol Helper Downloads"
     - "MSI Download Button"
+    - "Protocol Setup System"
+    - "Auto-Install Flow"
+    - "Download Statistics Integration"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implementado sistema completo de download e instalação automática de MSI usando custom protocol handler. Backend fornece MSI, registry files e PowerShell scripts. Frontend tem interface inteligente que guia o usuário através do processo de configuração e instalação automática."
+    message: "Implementado sistema completo de download e instalação automática de MSI usando custom protocol handler. Backend fornece MSI, registry files e PowerShell scripts. Frontend tem interface inteligente que guia o usuário através do processo de configuração e instalação automática. Usuário quer teste completo de todo o sistema."
   - agent: "testing"
     message: "Completed testing of all backend components. All backend API endpoints are working correctly. The MSI Download API, Protocol Helper Downloads, and Download Statistics functionality are all working as expected. The MongoDB integration for tracking downloads is also working properly. All tests passed successfully."
