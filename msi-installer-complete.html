@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSI Auto-Installer - Sistema Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.8); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .bounce-in {
+            animation: bounce-in 0.6s ease-out;
+        }
+        
+        .glass {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+        }
+        
+        button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .status-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .status-info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4 bounce-in">
+                🚀 MSI Auto-Installer
+            </h1>
+            <p class="text-xl text-blue-200 max-w-2xl mx-auto">
+                Sistema inteligente que baixa e instala arquivos MSI automaticamente no Windows
+            </p>
+            <p class="text-sm text-gray-300 mt-4">
+                ⚠️ <strong>Configuração da API:</strong> <span id="api-status" class="text-red-300">Não configurada</span>
+            </p>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="glass rounded-2xl p-6 border border-white/20">
+                <h2 class="text-xl font-bold text-white mb-4">⚙️ Configuração da API</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-200 mb-2">URL do Backend:</label>
+                        <input 
+                            type="text" 
+                            id="api-url-input" 
+                            placeholder="https://seu-backend.herokuapp.com" 
+                            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-200 mb-2">Nome do Arquivo MSI:</label>
+                        <input 
+                            type="text" 
+                            id="msi-filename-input" 
+                            placeholder="sample.msi" 
+                            value="sample.msi"
+                            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    <button 
+                        onclick="saveConfiguration()" 
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
+                    >
+                        💾 Salvar Configuração
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8">
+                
+                <!-- Left Column - Main Action -->
+                <div class="glass rounded-2xl p-8 border border-white/20">
+                    <h2 class="text-2xl font-bold text-white mb-6" id="main-title">
+                        ⚙️ Configure o Sistema
+                    </h2>
+                    
+                    <div id="setup-panel">
+                        <div class="space-y-4">
+                            <p class="text-gray-200">
+                                Para usar a instalação automática, primeiro configure o sistema:
+                            </p>
+                            <button
+                                onclick="downloadSetup()"
+                                class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-6 rounded-xl"
+                            >
+                                📥 Baixar Configuração do Sistema
+                            </button>
+                            <button
+                                onclick="markSetupComplete()"
+                                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl"
+                            >
+                                ✓ Marcar como Configurado
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="install-panel" style="display: none;">
+                        <div class="space-y-4">
+                            <p class="text-green-200">
+                                ✅ Sistema pronto! Clique para baixar e instalar automaticamente:
+                            </p>
+                            <button
+                                onclick="downloadAndInstall()"
+                                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl pulse-glow"
+                            >
+                                🔥 BAIXAR E INSTALAR AUTOMATICAMENTE
+                            </button>
+                            <button
+                                onclick="testAutoInstall()"
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl"
+                            >
+                                🧪 Testar Protocolo de Instalação
+                            </button>
+                            <button
+                                onclick="resetSetup()"
+                                class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl"
+                            >
+                                🔄 Resetar Configuração
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Display -->
+                    <div id="status-display" class="mt-6 p-4 rounded-xl border hidden">
+                        <p id="status-text" class="font-medium"></p>
+                    </div>
+                </div>
+
+                <!-- Right Column - Info and Stats -->
+                <div class="space-y-6">
+                    
+                    <!-- API Status -->
+                    <div class="glass rounded-2xl p-6 border border-white/20">
+                        <h3 class="text-xl font-bold text-white mb-4">🌐 Status da API</h3>
+                        <div id="api-status-panel" class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Conexão:</span>
+                                <span id="connection-status" class="text-red-300">❌ Desconectado</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Backend:</span>
+                                <span id="backend-status" class="text-red-300">❌ Offline</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Downloads:</span>
+                                <span id="downloads-count" class="text-gray-300">0</span>
+                            </div>
+                            <button onclick="testConnection()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+                                🔄 Testar Conexão
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- How it Works -->
+                    <div class="glass rounded-2xl p-6 border border-white/20">
+                        <h3 class="text-xl font-bold text-white mb-4">🔧 Como Funciona</h3>
+                        <div class="space-y-3 text-sm text-gray-200">
+                            <div class="flex items-start space-x-2">
+                                <span class="text-blue-400">1.</span>
+                                <span>Registra um protocolo customizado no Windows</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-blue-400">2.</span>
+                                <span>Baixa o arquivo MSI automaticamente</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-blue-400">3.</span>
+                                <span>Executa o MSI com permissões elevadas</span>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-blue-400">4.</span>
+                                <span>Mostra progresso e status em tempo real</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deploy Instructions -->
+                    <div class="glass rounded-2xl p-6 border border-white/20">
+                        <h3 class="text-xl font-bold text-white mb-4">🚀 Deploy do Backend</h3>
+                        <div class="space-y-2 text-sm text-gray-200">
+                            <p><strong>1. Railway:</strong> railway.app</p>
+                            <p><strong>2. Heroku:</strong> heroku.com</p>
+                            <p><strong>3. Render:</strong> render.com</p>
+                            <p><strong>4. Vercel:</strong> vercel.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="bg-red-500/20 backdrop-blur-lg rounded-2xl p-6 border border-red-400/30">
+                        <h3 class="text-xl font-bold text-red-300 mb-2">🔒 Aviso de Segurança</h3>
+                        <p class="text-red-200 text-sm">
+                            Este sistema executa arquivos com permissões elevadas. 
+                            Use apenas com arquivos confiáveis de fontes verificadas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-12">
+            <p class="text-blue-300">
+                Desenvolvido com ❤️ para automação de instalações MSI
+            </p>
+            <p class="text-gray-400 text-sm mt-2">
+                Versão: 1.0.0 | Compatível com Windows 10/11
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração global
+        let MSI_CONFIG = {
+            apiUrl: '',
+            msiFileName: 'sample.msi'
+        };
+
+        // Carregar configuração salva
+        function loadConfiguration() {
+            const saved = localStorage.getItem('msi-config');
+            if (saved) {
+                MSI_CONFIG = JSON.parse(saved);
+                document.getElementById('api-url-input').value = MSI_CONFIG.apiUrl;
+                document.getElementById('msi-filename-input').value = MSI_CONFIG.msiFileName;
+                updateApiStatus();
+            }
+        }
+
+        // Salvar configuração
+        function saveConfiguration() {
+            const apiUrl = document.getElementById('api-url-input').value.trim();
+            const msiFileName = document.getElementById('msi-filename-input').value.trim() || 'sample.msi';
+            
+            if (!apiUrl) {
+                showStatus('❌ Por favor, insira a URL do backend!', 'error');
+                return;
+            }
+
+            MSI_CONFIG = {
+                apiUrl: apiUrl.endsWith('/api') ? apiUrl : apiUrl + '/api',
+                msiFileName: msiFileName
+            };
+
+            localStorage.setItem('msi-config', JSON.stringify(MSI_CONFIG));
+            showStatus('✅ Configuração salva! Testando conexão...', 'success');
+            
+            setTimeout(() => {
+                testConnection();
+            }, 1000);
+        }
+
+        // Testar conexão com API
+        async function testConnection() {
+            if (!MSI_CONFIG.apiUrl) {
+                showStatus('❌ Configure a URL da API primeiro!', 'error');
+                return;
+            }
+
+            showStatus('🔄 Testando conexão...', 'info');
+            
+            try {
+                const response = await fetch(MSI_CONFIG.apiUrl + '/');
+                const data = await response.json();
+                
+                if (response.ok && data.message) {
+                    document.getElementById('connection-status').innerHTML = '✅ Conectado';
+                    document.getElementById('connection-status').className = 'text-green-300';
+                    document.getElementById('backend-status').innerHTML = '✅ Online';
+                    document.getElementById('backend-status').className = 'text-green-300';
+                    document.getElementById('api-status').innerHTML = '✅ Configurada';
+                    document.getElementById('api-status').className = 'text-green-300';
+                    
+                    showStatus('✅ Conexão estabelecida com sucesso!', 'success');
+                    
+                    // Carregar estatísticas
+                    loadDownloadStats();
+                } else {
+                    throw new Error('Resposta inválida do servidor');
+                }
+            } catch (error) {
+                document.getElementById('connection-status').innerHTML = '❌ Erro';
+                document.getElementById('connection-status').className = 'text-red-300';
+                document.getElementById('backend-status').innerHTML = '❌ Offline';
+                document.getElementById('backend-status').className = 'text-red-300';
+                
+                showStatus('❌ Erro na conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Carregar estatísticas de download
+        async function loadDownloadStats() {
+            try {
+                const response = await fetch(MSI_CONFIG.apiUrl + '/downloads');
+                const downloads = await response.json();
+                document.getElementById('downloads-count').textContent = downloads.length;
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        // Verificar se está configurado
+        function checkSetupStatus() {
+            const isSetupComplete = localStorage.getItem('msi-protocol-setup') === 'true';
+            
+            if (isSetupComplete) {
+                document.getElementById('main-title').innerHTML = '✅ Sistema Configurado';
+                document.getElementById('setup-panel').style.display = 'none';
+                document.getElementById('install-panel').style.display = 'block';
+            } else {
+                document.getElementById('main-title').innerHTML = '⚙️ Configure o Sistema';
+                document.getElementById('setup-panel').style.display = 'block';
+                document.getElementById('install-panel').style.display = 'none';
+            }
+        }
+
+        // Baixar configuração do sistema
+        async function downloadSetup() {
+            if (!MSI_CONFIG.apiUrl) {
+                showStatus('❌ Configure a URL da API primeiro!', 'error');
+                return;
+            }
+
+            showStatus('📥 Baixando configuração do sistema...', 'info');
+            
+            try {
+                const link = document.createElement('a');
+                link.href = MSI_CONFIG.apiUrl + '/download/installer-helper.ps1';
+                link.download = 'installer-helper.ps1';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('✅ Configuração baixada! Execute como Administrador e depois clique em "Marcar como Configurado"', 'success');
+                
+                // Rastrear download
+                trackDownload('installer-helper.ps1');
+            } catch (error) {
+                showStatus('❌ Erro ao baixar configuração: ' + error.message, 'error');
+            }
+        }
+
+        // Marcar como configurado
+        function markSetupComplete() {
+            localStorage.setItem('msi-protocol-setup', 'true');
+            checkSetupStatus();
+            showStatus('🎉 Sistema marcado como configurado! Agora você pode usar a instalação automática.', 'success');
+        }
+
+        // Resetar configuração
+        function resetSetup() {
+            localStorage.removeItem('msi-protocol-setup');
+            checkSetupStatus();
+            showStatus('🔄 Configuração resetada. Configure novamente para usar a instalação automática.', 'warning');
+        }
+
+        // Baixar e instalar MSI
+        async function downloadAndInstall() {
+            if (!MSI_CONFIG.apiUrl) {
+                showStatus('❌ Configure a URL da API primeiro!', 'error');
+                return;
+            }
+
+            showStatus('🚀 Iniciando download...', 'info');
+            
+            try {
+                // Download do MSI
+                const link = document.createElement('a');
+                link.href = MSI_CONFIG.apiUrl + '/download/' + MSI_CONFIG.msiFileName;
+                link.download = MSI_CONFIG.msiFileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Rastrear download
+                await trackDownload(MSI_CONFIG.msiFileName);
+                
+                showStatus('📦 Download iniciado! Executando instalação automática...', 'info');
+                
+                // Executar automaticamente após 3 segundos
+                setTimeout(() => {
+                    const username = getUserName();
+                    const msiPath = `C:\\Users\\${username}\\Downloads\\${MSI_CONFIG.msiFileName}`;
+                    const protocolUrl = `msiexec://${msiPath}`;
+                    
+                    const protocolLink = document.createElement('a');
+                    protocolLink.href = protocolUrl;
+                    protocolLink.style.display = 'none';
+                    document.body.appendChild(protocolLink);
+                    protocolLink.click();
+                    document.body.removeChild(protocolLink);
+                    
+                    showStatus('🎉 Instalação automática iniciada! Verifique as janelas do sistema.', 'success');
+                    
+                    // Atualizar estatísticas
+                    loadDownloadStats();
+                }, 3000);
+                
+            } catch (error) {
+                showStatus('❌ Erro durante o processo: ' + error.message, 'error');
+            }
+        }
+
+        // Testar instalação automática
+        function testAutoInstall() {
+            showStatus('🧪 Testando protocolo de instalação...', 'info');
+            
+            const testUrl = 'msiexec://test';
+            const link = document.createElement('a');
+            link.href = testUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showStatus('✅ Teste do protocolo enviado. Se configurado corretamente, você deve ver uma janela do sistema.', 'success');
+        }
+
+        // Rastrear download
+        async function trackDownload(filename) {
+            try {
+                await fetch(MSI_CONFIG.apiUrl + '/track-download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: filename,
+                        user_agent: navigator.userAgent,
+                        ip_address: 'client-side'
+                    })
+                });
+            } catch (error) {
+                console.error('Erro ao rastrear download:', error);
+            }
+        }
+
+        // Obter nome do usuário
+        function getUserName() {
+            // Simples fallback - em produção você pode melhorar isso
+            return 'User';
+        }
+
+        // Mostrar status
+        function showStatus(message, type = 'info') {
+            const statusDisplay = document.getElementById('status-display');
+            const statusText = document.getElementById('status-text');
+            
+            statusDisplay.className = `mt-6 p-4 rounded-xl border status-${type}`;
+            statusText.textContent = message;
+            statusDisplay.classList.remove('hidden');
+            
+            // Auto-hide after 10 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDisplay.classList.add('hidden');
+                }, 10000);
+            }
+        }
+
+        // Atualizar status da API
+        function updateApiStatus() {
+            if (MSI_CONFIG.apiUrl) {
+                document.getElementById('api-status').innerHTML = '⚠️ Configurada (teste conexão)';
+                document.getElementById('api-status').className = 'text-yellow-300';
+            }
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfiguration();
+            checkSetupStatus();
+            
+            // Testar conexão automaticamente se configurado
+            if (MSI_CONFIG.apiUrl) {
+                setTimeout(testConnection, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
