@@ -187,6 +187,30 @@ frontend:
         agent: "main"
         comment: "Interface moderna com instruções e estatísticas"
 
+  - task: "Download Statistics Integration"
+    implemented: true
+    working: false
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Integração com backend para tracking e exibição de estatísticas"
+
+  - task: "Auto-Install Flow"
+    implemented: true
+    working: false
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fluxo completo de download e instalação automática usando custom protocol"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
