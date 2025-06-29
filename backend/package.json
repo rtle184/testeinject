@@ -1,0 +1,16 @@
+{
+  "name": "msi-auto-installer-backend",
+  "version": "1.0.0",
+  "description": "Backend para MSI Auto-Installer - Sistema de download e instalação automática",
+  "main": "server.py",
+  "scripts": {
+    "start": "uvicorn server:app --host=0.0.0.0 --port=${PORT:-8000}",
+    "dev": "uvicorn server:app --reload"
+  },
+  "engines": {
+    "python": "3.11.0"
+  },
+  "keywords": ["msi", "installer", "download", "automation", "windows"],
+  "author": "MSI Auto-Installer System",
+  "license": "MIT"
+}
